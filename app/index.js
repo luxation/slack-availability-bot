@@ -43,7 +43,7 @@ bot.event("app_mention", async ({context, event}) => {
         }
     } else if (command === 'list') {
         let allUsers = DB().query('SELECT * FROM users');
-        reply(context, event, allUsers.length > 0 ? `Here is the list of available people here in <#${event.channel}>\r\n` + allUsers.map((u) => `- <@${u.username}>\r\n`) : 'No one is available at the moment.')
+        reply(context, event, allUsers.length > 0 ? `Here is the list of available people here in <#${event.channel}>\r\n` + allUsers.map((u) => `- <@${u.username}>\r\n`).join('') : 'No one is available at the moment.')
     }
 });
 
