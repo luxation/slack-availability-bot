@@ -1,8 +1,8 @@
 -- Up
 CREATE TABLE `users` (
     id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL,
-    channel TEXT NOT NULL
+    identity TEXT NOT NULL,
+    username TEXT NOT NULL
 );
 
 -- Down
