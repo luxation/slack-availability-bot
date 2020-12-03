@@ -25,44 +25,42 @@ bot.event("app_mention", async ({context, event}) => {
     const command = event.text.split(">")[1].trim().toLowerCase();
 
     if (command === 'in') {
-        DB().insert('users', {username: event.user, channel: event.channel});
-        try {
-            await bot.client.chat.postMessage({
-                token: context.botToken,
-                channel: event.channel,
-                text: `Hey <@${event.user}> thanks for tuning in. Have a nice working day!`
-            });
-        } catch (e) {
-            console.log(`error responding ${e}`);
+        let user = DB().queryFirstRow('SELECT * FROM users WHERE username=? AND channel=?', [event.user, event.channel]);
+        if (user) {
+            reply(context, event, `Hey <@${event.user}> you're already in!`);
+        } else {
+            DB().insert('users', {username: event.user, channel: event.channel});
+            reply(context, event, `Hey <@${event.user}> thanks for tuning in. Have a nice working day!`);
         }
+
     } else if (command === 'out') {
-        DB().delete('users', {username: event.user, channel: event.channel});
-        try {
-            await bot.client.chat.postMessage({
-                token: context.botToken,
-                channel: event.channel,
-                text: `Hope you had a productive day! See you soon <@${event.user}>.`
-            });
-        } catch (e) {
-            console.log(`error responding ${e}`);
+        let user = DB().queryFirstRow('SELECT * FROM users WHERE username=? AND channel=?', [event.user, event.channel]);
+        if (user) {
+            DB().delete('users', {username: event.user, channel: event.channel});
+            reply(context, event, `Hope you had a productive day! See you soon <@${event.user}>.`);
+        } else {
+            reply(context, event, `Hey <@${event.user}>, have you tuned in beforehand?`);
         }
     } else if (command === 'list') {
         let allUsers = DB().query('SELECT * FROM users');
-        try {
-            await bot.client.chat.postMessage({
-                token: context.botToken,
-                channel: event.channel,
-                text: allUsers.length > 0 ? `Here is the list of available people here in <#${event.channel}>\n` + allUsers.map((u) => `- <@${u.username}>\n`) : 'No one is available at the moment.'
-            });
-        } catch (e) {
-            console.log(`error responding ${e}`);
-        }
+        reply(context, event, allUsers.length > 0 ? `Here is the list of available people here in <#${event.channel}>\r\n` + allUsers.map((u) => `- <@${u.username}>\r\n`) : 'No one is available at the moment.')
     }
 });
+
+const reply = async (context, event, message) => {
+    try {
+        await bot.client.chat.postMessage({
+            token: context.botToken,
+            channel: event.channel,
+            text: message
+        });
+    } catch (e) {
+        console.log(`error responding ${e}`);
+    }
+};
 
 (async () => {
     // Start the app
     await bot.start(process.env.PORT || 3000);
-
     console.log('⚡️ Bolt app is running!');
 })();
