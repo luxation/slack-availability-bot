@@ -25,7 +25,7 @@ const bot = new App({
     token: process.env.SLACK_BOT_TOKEN
 });
 
-bot.command('/jarvis', async ({command, ack, say}) => {
+bot.command(`/${process.env.BOT_COMMAND}`, async ({command, ack, say}) => {
     await ack();
     let user = DB().queryFirstRow('SELECT * FROM users WHERE identity=?', command.user_id);
     switch (command.text.trim().toLowerCase()) {
@@ -61,7 +61,7 @@ bot.command('/jarvis', async ({command, ack, say}) => {
 
 const fetchRandomJoke = async () => {
     const res = await axios.get(jokesApi);
-    if(res.status === 200) {
+    if (res.status === 200) {
         return res.data['joke'];
     }
     return 'Well... that is awkward. I\'m out of jokes :(';

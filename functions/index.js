@@ -27,7 +27,7 @@ const app = new App({
 // Global Error Handler
 app.error(console.log);
 
-app.command('/jarvis', async ({command, ack, say}) => {
+app.command(`/${config.bot.command}`, async ({command, ack, say}) => {
     await ack();
     const docRef = db.collection('users');
     const userRef = docRef.doc(command.user_id);
@@ -78,6 +78,6 @@ const fetchRandomJoke = async () => {
 };
 
 // https://{your domain}.cloudfunctions.net/slack/events
-exports.slack = functions.region('europe-west3').https.onRequest(expressReceiver.app);
+exports.slack = functions.region(config.cloud.region).https.onRequest(expressReceiver.app);
 
 
